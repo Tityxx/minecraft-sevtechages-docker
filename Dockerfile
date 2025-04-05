@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1
-
 FROM openjdk:8u312-jre-buster
 
 LABEL version="3.2.3"
@@ -8,17 +6,30 @@ LABEL homepage.name="SevTech: Ages - 3.2.3"
 LABEL homepage.icon="https://media.forgecdn.net/avatars/147/67/636574428512291945.png"
 LABEL homepage.widget.type=minecraft
 LABEL homepage.widget.url=udp://SevTechAges:25565
-RUN apt-get update && apt-get install -y curl unzip && \
- adduser --uid 99 --gid 100 --home /data --disabled-password minecraft
 
-COPY launch.sh /launch.sh
-RUN chmod +x /launch.sh
+RUN apt-get update && apt-get install -y curl unzip
 
-USER minecraft
+ENV DATA_DIR="/serverdata"
+ENV DOWNLOADS_DIR="${DATA_DIR}/downloads"
+ENV SERVER_DIR="${DATA_DIR}/serverfiles"
+ENV ARCHIEVE_NAME="SevTech_Ages_Server_3.2.3.zip"
+ENV ARCHIEVE_PATH="${DOWNLOADS_DIR}/${ARCHIEVE_NAME}"
+ENV GAME_PORT=25565
+ENV UMASK=000
+ENV UID=568
+ENV GID=568
+ENV USER="minecraft"
+ENV DATA_PERM=770
 
-VOLUME /data
-WORKDIR /data
+RUN mkdir $DATA_DIR && \
+	mkdir $DOWNLOADS_DIR && \
+	mkdir $SERVER_DIR && \
+    useradd -d $DATA_DIR -s "/bin/bash" $USER && \
+	chown -R $USER $DATA_DIR && \
+	ulimit -n 2048
 
-EXPOSE 25565/tcp
+ADD /scripts/ /scripts/
+RUN chmod -R 770 /scripts/
 
-CMD ["/launch.sh"]
+#Server Start
+ENTRYPOINT ["/scripts/start.sh"]

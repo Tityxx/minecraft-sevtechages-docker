@@ -1,9 +1,5 @@
 #!/bin/bash
 
-set -x
-
-cd /data
-
 if ! [[ "$EULA" = "false" ]] || grep -i true eula.txt; then
 	echo "eula=true" > eula.txt
 else
@@ -12,7 +8,6 @@ else
 fi
 
 if ! [[ -f SevTech_Ages_Server_3.2.3.zip ]]; then
-	rm -fr config journeymap mods resources scripts structures SevTech_Ages_Server*.zip
 	curl -Lo SevTech_Ages_Server_3.2.3.zip 'https://edge.forgecdn.net/files/3570/46/SevTech_Ages_Server_3.2.3.zip' && unzip -u -o SevTech_Ages_Server_3.2.3.zip -d /data
 	chmod +x Install.sh
 	./Install.sh
